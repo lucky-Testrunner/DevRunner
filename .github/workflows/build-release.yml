@@ -194,7 +194,6 @@ jobs:
           generate_release_notes: true
           files: release-assets/*
           fail_on_unmatched_files: false
-          make_latest: true
         env:
           GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
 
