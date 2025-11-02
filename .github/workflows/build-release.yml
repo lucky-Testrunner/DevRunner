@@ -152,21 +152,24 @@ jobs:
           rm -f artifacts.txt
           count=0
 
-          while IFS= read -r -d '' file; do
-            relative="${file#artifacts/}"
-            artifact="${relative%%/*}"
-            base="$(basename "$file")"
-            safe_artifact="${artifact//[^A-Za-z0-9._-]/_}"
-            dest="release-assets/${safe_artifact}-${base}"
-            cp "$file" "$dest"
-            echo "$dest" >> artifacts.txt
-            ((count++))
-          done < <(find artifacts -type f \( -name "*.exe" -o -name "*.zip" -o -name "*.yml" -o -name "*.msi" \) -print0)
+          if [ -d "artifacts" ]; then
+            while IFS= read -r -d '' file; do
+              relative="${file#artifacts/}"
+              artifact="${relative%%/*}"
+              base="$(basename "$file")"
+              safe_artifact="${artifact//[^A-Za-z0-9._-]/_}"
+              dest="release-assets/${safe_artifact}-${base}"
+              cp "$file" "$dest"
+              echo "$dest" >> artifacts.txt
+              ((count++))
+            done < <(find artifacts -type f \( -name "*.exe" -o -name "*.zip" -o -name "*.yml" -o -name "*.msi" \) -print0 2>/dev/null || true)
+          fi
 
           echo "count=$count" >> "$GITHUB_OUTPUT"
 
           echo "Release assets:"
-          ls -lh release-assets/ || echo "No assets found"
+          ls -lh release-assets/ 2>/dev/null || echo "No assets found"
+          echo "Total assets: $count"
 
       - name: Create GitHub release
         if: steps.assets.outputs.count > 0
