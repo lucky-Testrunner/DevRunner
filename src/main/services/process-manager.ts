@@ -372,28 +372,64 @@ class ProcessManager extends EventEmitter {
         this.emit('process:output', { commandId, output: startupLog })
         
         this.setupProcessListeners(commandId, childProcess)
-      } else {
-        // oneoff命令也需要监听退出事件以清理
-        childProcess.on('exit', () => {
-          this.processes.delete(commandId)
-          this.processInfo.delete(commandId)
-          this.removePersistedProcessInfo(commandId)
-        })
         
-        childProcess.on('error', () => {
-          this.processes.delete(commandId)
-          this.processInfo.delete(commandId)
-          this.removePersistedProcessInfo(commandId)
+        this.persistProcessInfo(commandId, info)
+        this.emit('process:started', { commandId, pid })
+        
+        return {
+          success: true,
+          commandId,
+          pid
+        }
+      } else {
+        // oneoff命令等待完成后返回结果(包含退出码)
+        return new Promise((resolve) => {
+          childProcess.on('exit', (code, signal) => {
+            const info = this.processInfo.get(commandId)
+            if (info) {
+              info.status = 'stopped'
+              info.exitCode = code !== null ? code : undefined
+              this.processInfo.set(commandId, info)
+            }
+            
+            this.processes.delete(commandId)
+            this.processInfo.delete(commandId)
+            this.removePersistedProcessInfo(commandId)
+            
+            this.emit('process:exit', { commandId, exitCode: code, signal })
+            
+            resolve({
+              success: true,
+              commandId,
+              pid,
+              exitCode: code !== null ? code : undefined
+            })
+          })
+          
+          childProcess.on('error', (error) => {
+            const info = this.processInfo.get(commandId)
+            if (info) {
+              info.status = 'error'
+              info.error = error.message
+              this.processInfo.set(commandId, info)
+            }
+            
+            this.processes.delete(commandId)
+            this.processInfo.delete(commandId)
+            this.removePersistedProcessInfo(commandId)
+            
+            this.emit('process:error', { commandId, error: error.message })
+            
+            resolve({
+              success: false,
+              commandId,
+              error: error.message
+            })
+          })
+          
+          this.persistProcessInfo(commandId, info)
+          this.emit('process:started', { commandId, pid })
         })
-      }
-      
-      this.persistProcessInfo(commandId, info)
-      this.emit('process:started', { commandId, pid })
-      
-      return {
-        success: true,
-        commandId,
-        pid
       }
     } catch (error) {
       return {

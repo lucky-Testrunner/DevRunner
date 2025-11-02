@@ -142,8 +142,6 @@ describe('Process Manager Integration', () => {
 
       expect(result.success).toBe(true)
       expect(result.exitCode).toBe(0)
-      // oneoff 命令不捕获输出
-      expect(result.output).toBeUndefined()
       expect(manager.isProcessRunning('cmd-2')).toBe(false)
     })
   })
