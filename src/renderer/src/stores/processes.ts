@@ -7,18 +7,18 @@ export const useProcessesStore = defineStore('processes', () => {
   const executingCommands = ref<Set<string>>(new Set())
   const error = ref<string | null>(null)
 
-  // 事件监听清理函数
-  let unsubscribeOutput: (() => void) | null = null
-  let unsubscribeStarted: (() => void) | null = null
-  let unsubscribeExit: (() => void) | null = null
-  let unsubscribeError: (() => void) | null = null
-  let unsubscribePorts: (() => void) | null = null
+  // 事件监听清理函数（保留以备将来使用）
+  let _unsubscribeOutput: (() => void) | null = null
+  let _unsubscribeStarted: (() => void) | null = null
+  let _unsubscribeExit: (() => void) | null = null
+  let _unsubscribeError: (() => void) | null = null
+  let _unsubscribePorts: (() => void) | null = null
 
   // 初始化事件监听
   function initializeEventListeners() {
     if (window.electronAPI?.on) {
       // 监听进程输出
-      unsubscribeOutput = window.electronAPI.on.processOutput((data) => {
+      _unsubscribeOutput = window.electronAPI.on.processOutput((data) => {
         const outputs = processOutputs.value.get(data.commandId) || []
         outputs.push(data.output)
         
@@ -31,23 +31,23 @@ export const useProcessesStore = defineStore('processes', () => {
       })
 
       // 监听进程启动
-      unsubscribeStarted = window.electronAPI.on.processStarted((data) => {
+      _unsubscribeStarted = window.electronAPI.on.processStarted((data) => {
         refreshProcessInfo(data.commandId)
       })
 
       // 监听进程退出
-      unsubscribeExit = window.electronAPI.on.processExit((data) => {
+      _unsubscribeExit = window.electronAPI.on.processExit((data) => {
         refreshProcessInfo(data.commandId)
       })
 
       // 监听进程错误
-      unsubscribeError = window.electronAPI.on.processError((data) => {
+      _unsubscribeError = window.electronAPI.on.processError((data) => {
         refreshProcessInfo(data.commandId)
       })
 
       // 监听进程端口信息
       if (window.electronAPI.on.processPorts) {
-        unsubscribePorts = window.electronAPI.on.processPorts((data) => {
+        _unsubscribePorts = window.electronAPI.on.processPorts((data) => {
           refreshProcessInfo(data.commandId)
         })
       }
