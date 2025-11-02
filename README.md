@@ -1,6 +1,8 @@
 # Electron Vue 应用
 
 一个使用 Electron、Vue 3 和 TypeScript 构建的现代桌面应用程序。
+<img width="1180" height="832" alt="image" src="https://github.com/user-attachments/assets/4551b17d-ac47-4c06-9ff8-b0e84940eb7b" />
+
 
 ## 技术栈
 
