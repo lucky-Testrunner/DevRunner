@@ -142,7 +142,8 @@ describe('Process Manager Integration', () => {
 
       expect(result.success).toBe(true)
       expect(result.exitCode).toBe(0)
-      expect(result.output).toContain('Build complete')
+      // oneoff 命令不捕获输出
+      expect(result.output).toBeUndefined()
       expect(manager.isProcessRunning('cmd-2')).toBe(false)
     })
   })
@@ -317,11 +318,14 @@ describe('Process Manager Integration', () => {
 
       const output = manager.getProcessOutput('cmd-1')
 
-      expect(output).toHaveLength(2)
+      // 应该有3条输出：启动命令 + stdout + stderr
+      expect(output).toHaveLength(3)
       expect(output[0].type).toBe('stdout')
-      expect(output[0].data).toContain('Server started')
-      expect(output[1].type).toBe('stderr')
-      expect(output[1].data).toContain('Warning: deprecated')
+      expect(output[0].data).toContain('$ npm run dev')
+      expect(output[1].type).toBe('stdout')
+      expect(output[1].data).toContain('Server started')
+      expect(output[2].type).toBe('stderr')
+      expect(output[2].data).toContain('Warning: deprecated')
     })
   })
 

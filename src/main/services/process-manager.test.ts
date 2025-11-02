@@ -99,7 +99,8 @@ describe('ProcessManager', () => {
 
       expect(result.success).toBe(true)
       expect(result.exitCode).toBe(0)
-      expect(result.output).toContain('hello')
+      // oneoff 命令不捕获输出
+      expect(result.output).toBeUndefined()
       expect(manager.isProcessRunning('cmd-2')).toBe(false)
     })
 
@@ -569,10 +570,13 @@ describe('ProcessManager', () => {
 
       const output = manager.getProcessOutput('cmd-20')
 
-      expect(output).toHaveLength(2)
+      // 应该有3条输出：启动命令 + 两条stdout
+      expect(output).toHaveLength(3)
       expect(output[0].type).toBe('stdout')
-      expect(output[0].data).toContain('Server started')
-      expect(output[1].data).toContain('Listening on port 3000')
+      expect(output[0].data).toContain('$ npm run dev')
+      expect(output[1].type).toBe('stdout')
+      expect(output[1].data).toContain('Server started')
+      expect(output[2].data).toContain('Listening on port 3000')
     })
 
     it('should capture stderr from service process', async () => {
@@ -592,9 +596,12 @@ describe('ProcessManager', () => {
 
       const output = manager.getProcessOutput('cmd-21')
 
-      expect(output).toHaveLength(1)
-      expect(output[0].type).toBe('stderr')
-      expect(output[0].data).toContain('Warning: deprecated API')
+      // 应该有2条输出：启动命令 + stderr
+      expect(output).toHaveLength(2)
+      expect(output[0].type).toBe('stdout')
+      expect(output[0].data).toContain('$ npm run dev')
+      expect(output[1].type).toBe('stderr')
+      expect(output[1].data).toContain('Warning: deprecated API')
     })
 
     it('should limit output buffer size', async () => {
