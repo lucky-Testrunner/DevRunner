@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref } from 'vue'
 
 export const useProcessesStore = defineStore('processes', () => {
   const processInfo = ref<Map<string, ProcessInfo>>(new Map())
@@ -54,14 +54,14 @@ export const useProcessesStore = defineStore('processes', () => {
     }
   }
 
-  // 清理事件监听
-  function cleanupEventListeners() {
-    unsubscribeOutput?.()
-    unsubscribeStarted?.()
-    unsubscribeExit?.()
-    unsubscribeError?.()
-    unsubscribePorts?.()
-  }
+  // 清理事件监听（保留以备将来使用）
+  // function cleanupEventListeners() {
+  //   unsubscribeOutput?.()
+  //   unsubscribeStarted?.()
+  //   unsubscribeExit?.()
+  //   unsubscribeError?.()
+  //   unsubscribePorts?.()
+  // }
 
   // 自动初始化
   initializeEventListeners()

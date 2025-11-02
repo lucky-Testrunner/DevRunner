@@ -119,7 +119,7 @@ jobs:
         run: npm test
 
       - name: Build Electron app (Windows - no signing)
-        run: npm run build:only && npx electron-builder ${{ matrix.build_args }} --publish never --config.win.sign=null --config.mac.identity=null
+        run: npm run build:only && npx electron-builder ${{ matrix.build_args }} --publish never
         env:
           CSC_IDENTITY_AUTO_DISCOVERY: false
           CSC_LINK: ""
