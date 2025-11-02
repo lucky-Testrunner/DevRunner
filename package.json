@@ -1,0 +1,53 @@
+{
+  "name": "devrunner",
+  "version": "0.1.0",
+  "description": "DevRunner - 开发运行器：高效管理和运行项目命令的桌面应用",
+  "main": "dist-electron/main/index.js",
+  "author": "lucky-Testrunner <luckytestrunner@gmail.com>",
+  "license": "MIT",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "electron-vite dev",
+    "build": "npm run typecheck && electron-vite build && electron-builder",
+    "build:only": "electron-vite build",
+    "build:portable": "npm run typecheck && electron-vite build && electron-builder --win portable",
+    "typecheck": "vue-tsc --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:ui": "vitest --ui"
+  },
+  "dependencies": {
+    "ansi-to-html": "^0.7.2",
+    "electron-store": "^11.0.2",
+    "iconv-lite": "^0.7.0",
+    "pinia": "^3.0.3",
+    "uuid": "^13.0.0",
+    "vue": "^3.4.21"
+  },
+  "devDependencies": {
+    "@types/iconv-lite": "^0.0.1",
+    "@types/node": "^20.11.30",
+    "@types/uuid": "^10.0.0",
+    "@typescript-eslint/eslint-plugin": "^7.1.1",
+    "@typescript-eslint/parser": "^7.1.1",
+    "@vitejs/plugin-vue": "^5.0.4",
+    "@vitest/ui": "^4.0.6",
+    "electron": "^28.3.0",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.0.0",
+    "eslint": "^8.57.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-vue": "^9.22.0",
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.2",
+    "vite": "^5.2.8",
+    "vitest": "^4.0.6",
+    "vue-tsc": "^2.0.6"
+  },
+  "engines": {
+    "node": "^18.18.0 || >=20.0.0"
+  }
+}

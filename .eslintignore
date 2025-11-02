@@ -1,0 +1,10 @@
+dist
+release
+dist-electron
+node_modules
+examples
+docs
+**/*.test.ts
+**/*.spec.ts
+src/main.js
+src/preload.js

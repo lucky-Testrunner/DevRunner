@@ -1,0 +1,33 @@
+appId: com.devrunner.app
+productName: DevRunner
+asar: true
+directories:
+  output: release
+  buildResources: build
+files:
+  - dist/**/*
+  - dist-electron/**/*
+  - package.json
+extraMetadata:
+  main: dist-electron/main/index.js
+win:
+  target:
+    - target: portable
+      arch:
+        - x64
+  sign: null
+  signingHashAlgorithms: []
+  verifyUpdateCodeSignature: false
+mac:
+  target:
+    - dmg
+    - zip
+  category: public.app-category.productivity
+  identity: null
+  hardenedRuntime: false
+  gatekeeperAssess: false
+linux:
+  target:
+    - AppImage
+    - tar.gz
+  category: Utility
