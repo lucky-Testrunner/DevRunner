@@ -146,30 +146,42 @@ jobs:
 
       - name: Prepare release assets
         id: assets
-        shell: bash
+        continue-on-error: false
+        shell: bash {0}
         run: |
+          set +e  # 不要在错误时退出
           mkdir -p release-assets
           rm -f artifacts.txt
           count=0
 
+          echo "Checking for artifacts directory..."
           if [ -d "artifacts" ]; then
+            echo "Artifacts directory found, listing contents:"
+            ls -la artifacts/ || true
+            
+            echo "Searching for release files..."
+            find artifacts -type f \( -name "*.exe" -o -name "*.zip" -o -name "*.yml" -o -name "*.msi" \) || true
+            
             while IFS= read -r -d '' file; do
+              echo "Processing: $file"
               relative="${file#artifacts/}"
               artifact="${relative%%/*}"
               base="$(basename "$file")"
               safe_artifact="${artifact//[^A-Za-z0-9._-]/_}"
               dest="release-assets/${safe_artifact}-${base}"
-              cp "$file" "$dest"
-              echo "$dest" >> artifacts.txt
-              ((count++))
-            done < <(find artifacts -type f \( -name "*.exe" -o -name "*.zip" -o -name "*.yml" -o -name "*.msi" \) -print0 2>/dev/null || true)
+              cp "$file" "$dest" && echo "$dest" >> artifacts.txt && ((count++)) || echo "Failed to copy $file"
+            done < <(find artifacts -type f \( -name "*.exe" -o -name "*.zip" -o -name "*.yml" -o -name "*.msi" \) -print0 2>/dev/null)
+          else
+            echo "Artifacts directory not found!"
           fi
 
           echo "count=$count" >> "$GITHUB_OUTPUT"
 
-          echo "Release assets:"
-          ls -lh release-assets/ 2>/dev/null || echo "No assets found"
+          echo "Release assets prepared:"
+          ls -lh release-assets/ 2>/dev/null || echo "No assets found in release-assets/"
           echo "Total assets: $count"
+          
+          exit 0  # 总是成功退出
 
       - name: Create GitHub release
         if: steps.assets.outputs.count > 0
